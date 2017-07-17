@@ -19,7 +19,7 @@ Where do shared bikes go?
   * Birth year of user (only available for registered users)
   * gender of user (only available for registered users)
   
- * [NOAA on-demand hourly weather data](https://www7.ncdc.noaa.gov/CDO/cdopoemain.cmd?datasetabbv=DS3505&countryabbv=&georegionabbv=NAMER&resolution=40)
+* [NOAA on-demand hourly weather data](https://www7.ncdc.noaa.gov/CDO/cdopoemain.cmd?datasetabbv=DS3505&countryabbv=&georegionabbv=NAMER&resolution=40)
   * temperature
   * perceived temperature
   * humidity
