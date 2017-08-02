@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<title>BikeShare</title>
+<style>
+
+	#boroughs {  
+	/*	het vasteland*/  	
+		stroke: none;
+		stroke-width: 0px;
+		fill: #01321c;
+		opacity:.9;
+		position:absolute;
+		top:0;
+		left:0;
+	}
+
+
+	body { 
+	/* de zee*/
+		margin:0;
+		position:fixed;
+		top:0;
+		right:0;
+		bottom:0;
+		left:0;
+		font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; 
+		background-color: #6c936c;
+		
+	}
+	div {
+		/* de text NYC citybike*/
+		font-size: 400%;
+		color: #ffffff;
+	}
+	svg { 
+		width:100%; height: 100%;
+	}
+	div.tooltip {
+		/* de popups*/
+		position: absolute;
+		text-align: center;
+		padding: 6px;
+		background: #292929;
+		border: 0px;
+		font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+		font-size:75%;
+		border-radius: 2px;
+		pointer-events: none;
+	}
+	circle {
+		/* de stippeltjes die stations voorstellen*/
+		fill:#ffffff;
+	}
+
+	input[type="radio"] {
+	  /* remove standard background appearance */
+	  -webkit-appearance: none;
+	  -moz-appearance: none;
+	  appearance: none;
+	  /* create custom radiobutton appearance */
+	  display: inline;
+	  width: 25px;
+	  height: 25px;
+	  padding: 6px;
+	  /* background-color only for content */
+	  background-clip: content-box;
+	  background-color: #e7e6e7;
+	  border-radius: 50%;
+	}
+
+/* appearance for checked radiobutton */
+	input[type="radio"]:checked {
+	  background-color: #006400;
+	}
+
+	/* optional styles, I'm using this for centering radiobuttons */
+	.flex {
+	  display: flex;
+	  align-items: center;
+	}
+
+
+
+</style>
+</head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+
+
+<body>
+    
+	<div style="position:absolute;z-index:2;margin-left: 2cm;"><br>NYC CITIBIKE<br>Weekdays Bike flow<div style="font-size: 60%; ">June 2016</div>
+	</div>
+<!-- 	Radio buttons with the same name are treated as a group. When you select one button, all other buttons in the same group are unselected. -->
+	<div style="position:absolute; margin-left:2cm;margin-top:45%">
+	<div class="flex"; style="font-size: 30%; font-family: Palatino Linotype, Book Antiqua, Palatino; color: #02484b";>
+	  <input type="radio" name="radio" id="radio1" onclick="getstartstations()"/>
+	  <label for="radio1">Start stations</label></div>
+	<div class="flex"; style="font-size: 30%; font-family: Palatino Linotype, Book Antiqua, Palatino; color: #02484b";>
+	  <input type="radio" name="radio" id="radio2" onclick="getendstations()"/>
+	  <label for="radio2">End stations</label></div>
+	<div class="flex"; style="font-size: 30%; font-family: Palatino Linotype, Book Antiqua, Palatino; color: #02484b";>
+	  <input type="radio" name="radio" id="radio3" onclick="getrelations()"/>
+	  <label for="radio3">Relations</label></div>
+	</div>
+
+
+	<script>
+	    var width = 960;
+	    var height = 500;
+	    
+		var div = d3.select("body").append("div")
+		    .attr("class", "tooltip")
+		    .style("opacity", 0);
+
+	    var svg = d3.select("body").append("svg");
+	    var map = svg.append("g")
+	    var dots = svg.append("g")
+	    var dots2 = svg.append("g")
+
+	    var projection = d3.geoMercator()
+	      .center([-74.065409, 40.750082])
+		  .scale(375000)
+	      .translate([width / 2, height / 2])
+
+	    var path = d3.geoPath()
+	      .projection(projection);
+	    
+	    var url = "http://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nybb/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson";
+
+	    var color = d3.scaleSequential(d3.interpolateYlOrRd);
+
+	    var probabilities = d3.json('relations.csv');
+
+
+	    d3.json(url, function(nyc) {
+	      	map.append("path")
+	      		.attr("id", "boroughs")
+	        	.attr("d", path(nyc));
+	    });
+
+	    function getstartstations() {
+	    	d3.csv("/static/coordinates_start_wd_f.csv", function(error, repos) {							
+				dots.selectAll("circle").remove();
+				dots.selectAll("station")
+					.data(repos)
+					.enter().append("circle")
+					.attr("r", 4)
+					.attr("cx", function(d) {return projection([d.longitude,d.latitude])[0]})
+					.attr("cy", function(d) {return projection([d.longitude,d.latitude])[1]})
+					.on("mouseover", function(d) {
+		       			div.transition()
+		         			.duration(200)
+		         			.style("opacity", .9);
+		       			div.html(d.name)
+		         			.style("left", (d3.event.pageX) + 16 + "px")
+		         			.style("top", (d3.event.pageY - 28) + "px");
+		       		})
+		     		.on("mouseout", function(d) {
+		       			div.transition()
+		         			.duration(500)
+		         			.style("opacity", 0);
+		         	})
+			});
+
+			
+		}
+
+		function getendstations() {
+			d3.csv("/static/coordinates_stop_wd_f.csv", function(error, repos) {	
+				dots.selectAll("circle").remove();						
+				dots.selectAll("station")
+					.data(repos)
+					.enter().append("circle")
+					.style("fill", "#ff7b00")
+					.attr("r", 4)
+					.attr("cx", function(d) {return projection([d.longitude,d.latitude])[0]})
+					.attr("cy", function(d) {return projection([d.longitude,d.latitude])[1]})
+					.on("mouseover", function(d) {
+		       			div.transition()
+		         			.duration(200)
+		         			.style("opacity", .9);
+		       			div.html(d.name)
+		         			.style("left", (d3.event.pageX) + 16 + "px")
+		         			.style("top", (d3.event.pageY - 28) + "px");
+		         		
+		       		})
+		     		.on("mouseout", function(d) {
+		       			div.transition()
+		         			.duration(500)
+		         			.style("opacity", 0);
+		         		
+		       		})
+		       	});
+		}
+
+		function getrelations() {
+			d3.csv("/static/coordinates_start_wd_f.csv", function(error, repos) {							
+				dots.selectAll("circle").remove();
+				dots.selectAll("station")
+					.data(repos)
+					.enter().append("circle")
+					.style("fill", "#03787d")
+					.attr("r", 4)
+					.attr("cx", function(d) {return projection([d.longitude,d.latitude])[0]})
+					.attr("cy", function(d) {return projection([d.longitude,d.latitude])[1]})
+					.attr("name", function(d) {return d.name})
+					.on("mouseover", function(d) {
+		       			div.transition()
+		         			.duration(200)
+		         			.style("opacity", .9);
+		       			div.html(d.name)
+		         			.style("left", (d3.event.pageX) + 16 + "px")
+		         			.style("top", (d3.event.pageY - 28) + "px");
+		       		})
+
+		     		.on("mouseout", function(d) {
+		       			div.transition()
+		         			.duration(500)
+		         			.style("opacity", 0);
+		       		})
+
+		       		.on("click", function(d) {
+		       			var t = d3.select(this).attr("name");
+					    console.log(t);
+		       			d3.select(this)
+		       				.style("fill", "#ffffff")
+		       				.attr("r", 6);
+		       			getprobabilities(t, dots)
+		       		})
+
+		       		//.on("dblclick", getrelations()) //recursive functions don't work here...
+			});
+		}
+
+		function getprobabilities(t, dots) {
+			console.log(t)
+			$.ajax({
+		         type: "POST",
+		         contentType: "application/json; charset=utf-8",
+		         url: "/relations",
+		         dataType: "json",
+		         data: JSON.stringify({"station": t}),
+		         success: function (d) {
+		            dataset=d
+		            console.log(d)
+		            color.domain(d3.extent(d, function(d) { return d.probability; }));
+		            dots.selectAll("station")
+		             	.data(dataset)
+		             	.enter().append("circle")
+						.style("fill", "#ffffff")
+						.attr("r", 4)
+						.style("fill", function(d) {return color(d.probability)})
+						.attr("cx", function(d) {return projection([d.longitude,d.latitude])[0]})
+						.attr("cy", function(d) {return projection([d.longitude,d.latitude])[1]})
+
+		       }
+
+			});
+
+		}
+
+	</script>
+
+</body>
