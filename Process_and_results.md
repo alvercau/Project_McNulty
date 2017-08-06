@@ -41,9 +41,9 @@ The target variable was unbalanced, so I always did stratified resampling for tr
 
 ## 5. Results
 
-For all commuters, the best model is Decision Tree, with about 8% accuracy. When trying to do predictions on a voting Classifier, the kernel consistently dies.
+For all comuters, the best model is Decision Tree, with about 8% accuracy. When trying to do predictions on a voting Classifier, the kernel consistently dies.
 
-For females commuters, the best model is a combination of Decision Tree and Random forests (soft vote, weights 1 and 5 respectively, parameters of each model tuned with GridSearch), which has an accuracy of about 13%. 
+For females comuters, the best model is a combination of Decision Tree and Random forests (soft vote, weights 1 and 5 respectively, parameters of each model tuned with GridSearch), which has an accuracy of about 13%. 
 The subset of the data for which relatively good predictions were made was selected for visualisation purposes, with the probabilities of a bike ending up in a given  end station from a given start station.
 
 
