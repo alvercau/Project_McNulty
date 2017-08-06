@@ -27,7 +27,7 @@ _At an earlier stage of the project, I classified the data according to the [bea
 The __weather data__ was cleaned before insertion in the database. The data was pretty dirty (strings inside of integers etc.) and SQL is not the best tool to clean data.  
 The data contained several columns with a lot of NaNs and empty columns corresponding to the daily weather data. These were dropped. Additonally, I converted the data to the correct data types.
 
-## 4. [Modelling](https://github.com/alvercau/Project_McNulty/blob/master/notebooks/End_station_dow_fem.ipynb)
+## 4. Modelling
 
 Due to technical limitations, the initial project was downsized:
 
@@ -56,8 +56,8 @@ Interactive map with 3 radiobuttons:
 
 ## 7. Future considerations
 
-Startstation was not one of the most predictive features, due to the reason that startstation was included as a combination of latitude and longitude, rather than as a categorical variable. 
-More data (more powerfull machine is needed)
+Startstation was not one of the most predictive features, due to the reason that startstation was included as a combination of latitude and longitude, rather than as a categorical variable.  
+More data (more powerfull machine is needed).  
 Multi-output classification: not only predict the end station, but also the end time. I suspect that predicting the end time will be easier (using linear regression) than predicting the end station. The predicted end time can be used to restrict the ouptu of the end station calssifier, giving rise to more accurate results. 
 
 
